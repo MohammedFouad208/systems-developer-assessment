@@ -1,0 +1,143 @@
+﻿@using NetC.JuniorDeveloperExam.Web.Model
+@model BlogPost
+@{
+  ViewBag.Title = "Post";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<!--Reply Part-->
+
+<div id="ReplyModal" class="modal ReplyModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Your Reply</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        @using (Html.BeginForm("AddReply", "BlogPost", FormMethod.Post))
+        {
+          <input type="hidden" name="PostID" value="@Model.id" />
+          <input type="hidden" name="CommentID" id="CommentID" value="" />
+          @Html.Partial("CommentForm")
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="col-lg-12">
+  <!-- Title -->
+  <h1 class="mt-4">@Model.title</h1>
+  <hr>
+  <!-- Date/Time -->
+  <p>Posted on  @Model.date.ToString("MMMM dd, yyyy")</p>
+  <hr>
+  <!-- Preview Image -->
+  <img class="img-fluid rounded" src="@Model.image" alt="@Model.title">
+  <hr>
+  <!-- Post Content -->
+  @Html.Raw(Model.htmlContent)
+  <hr>
+  <!-- Blog post comment form -->
+  <div class="card my-4">
+    <h5 class="card-header">Leave a Comment:</h5>
+    <div class="card-body">
+      @using (Html.BeginForm("AddComment", "BlogPost", FormMethod.Post))
+      {
+        <input type="hidden" name="PostID" value="@Model.id" />
+        @Html.Partial("CommentForm")
+      }
+    </div>
+  </div>
+  <!-- Blog post comments -->
+  @if (Model.Comments != null)
+  {
+    int count = 1;
+    foreach (var item in Model.Comments)
+    {
+      <div class="media mb-4">
+        <img class="d-flex mr-3 rounded-circle user-avatar" src="https://eu.ui-avatars.com/api/?name=@item.name" alt="@item.name">
+        <div class="media-body">
+          <h5 class="mt-0">@item.name <small><em>@item.date.ToString("MMMM dd, yyyy - HH:mm")</em></small>  <span class="replyButton" onclick="OpenReplyModel(@count)">Add Reply</span>  </h5>
+          @item.message
+        </div>
+      </div>
+
+      if (item.Replies != null)
+      {
+        <div class="Replies">
+          @foreach (var element in item.Replies)
+          {
+            <div class="media mb-4">
+              <img class="d-flex mr-3 rounded-circle user-avatar" src="https://eu.ui-avatars.com/api/?name=@element.name" alt="@element.name">
+              <div class="media-body">
+                <h5 class="mt-0">@element.name <small><em>@element.date.ToString("MMMM dd, yyyy - HH:mm")</em></small></h5>
+                @element.message
+              </div>
+            </div>
+           }
+        </div>
+
+      }
+      count++;
+    }
+  }
+
+</div>
+
+@section scripts{
+  <script>
+    function OpenReplyModel(CommentID) {
+      $("#CommentID").val(CommentID);
+      $("#ReplyModal").modal();
+      $("#ReplyModal").find('form').trigger('reset');
+      $("#ReplyModal").find('form').find('span').html("");
+      $("#ReplyModal").find('form').find('button').html("Add Reply");
+    }
+    $(document).ready(function () {
+      $("Form").submit(function (e) {
+        var flag = true;
+        var Name = $(this).find('input[name="name"]').val();
+        var Email = $(this).find('input[name="emailAddress"]').val();
+        var Message = $(this).find('textarea[name="message"]').val();
+
+        if (Name == null || Name == "") {
+          $(this).find('span[id="NameErrMsg"]').removeClass("d-none").html("Please Enter Your Name");
+          flag = false;
+        }
+        else {
+          $(this).find('span[id="NameErrMsg"]').addClass("d-none").html("");
+        }
+
+        if (Message == null || Message == "") {
+          $(this).find('span[id="MessageErrMsg"]').removeClass("d-none").html("Please Enter Your Message");
+          flag = false;
+        }
+        else {
+          $(this).find('span[id="MessageErrMsg"]').addClass("d-none").html("");
+        }
+
+        if (Email == null || Email == "") {
+          $(this).find('span[id="EmailErrMsg"]').removeClass("d-none").html("Please Enter Your Message");
+          flag = false;
+        }
+        else {
+          $(this).find('span[id="EmailErrMsg"]').addClass("d-none").html("");
+        }
+
+        if (flag == false)
+          e.preventDefault();
+
+      });
+    });
+
+  </script>
+
+}
+
+

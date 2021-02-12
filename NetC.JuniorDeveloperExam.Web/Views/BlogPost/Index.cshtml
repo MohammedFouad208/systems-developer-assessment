@@ -1,0 +1,28 @@
+﻿@using NetC.JuniorDeveloperExam.Web.Model;
+
+@model IEnumerable<BlogPost>
+@{
+  ViewBag.Title = "Index";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+  <div class="col-12">
+    @foreach (var item in Model)
+    {
+      <div class="card mt-4 mb-4">
+        <img class="card-img-top" src="@item.image" alt="Card image cap">
+        <div class="card-body">
+          <h5 class="card-title">@item.title</h5>
+          <p class="card-text">@Html.Raw(item.htmlContent.Substring(0, 100))...</p>
+          <hr />
+          <span>@item.date.ToString("dddd, dd MMMM yyyy")</span>
+          <hr />
+          <a href="@Url.Action("Post", "BlogPost", new { id = item.id })" class="btn btn-primary text-white">Details</a>
+        </div>
+      </div>
+    }
+  </div>
+
+</div>
+
